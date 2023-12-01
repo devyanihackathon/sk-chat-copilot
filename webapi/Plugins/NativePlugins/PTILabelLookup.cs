@@ -15,12 +15,13 @@ namespace CopilotChat.WebApi.Plugins.NativePlugins;
 
 public class PTILabelLookup
 {
-  [SKFunction, Description("Validate PTI Image")]
+  [SKFunction, Description("Validate PTI Image Compliance and return the PTI barcode if detected")]
   public async Task<string> ValidatePTIImage(string filename)
   {
     string responseContent = string.Empty;
-    string filePath = ("C:\\temp\\sams\\pti\\" + filename);
-    string url = "";
+    string filePath = ("/Users/d0g0dj6/Documents/Projects/AI Assisted Claims/Hackathon/python/" +filename);
+    Console.WriteLine("filenname:" + filePath);
+    string url = "http://localhost:7071/api/barcodeCompliances?image=" +filePath;
 
     try
     {
@@ -28,10 +29,14 @@ public class PTILabelLookup
       {
         using (var content = new MultipartFormDataContent())
         {
-          byte[] fileBytes = File.ReadAllBytes(filePath);
-          content.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "file", filename);
+          // byte[] fileBytes = File.ReadAllBytes(filePath);
+          // Console.WriteLine("bytes:" + fileBytes);
+          // content.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "file", filename);
+          Console.WriteLine("Before PostAsync:");
 
-          var response = await client.PostAsync(url, content);
+          var response = await client.GetAsync(url);
+  
+          Console.WriteLine("After PostAsync:" + response);
 
           if (response.IsSuccessStatusCode)
           {
@@ -53,13 +58,15 @@ public class PTILabelLookup
   }
   
 
-  [SKFunction, Description("Get Product Details using PTI Number")]
+  [SKFunction, Description("Get Product Details using the given PTI Number above")]
   public async Task<string> GetProductDetails(string ptinumber)
   {
     //string connectionString = "Server=tcp:your_server.database.windows.net,1433;Initial Catalog=your_database;Persist Security Info=False;User ID=your_username;Password=your_password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
-    string connectionString = Environment.GetEnvironmentVariable("PRODUCT_DETAIL_DB");
-
+    string connectionString = Environment.GetEnvironmentVariable("PRODUCT_DETAILS_DB");
+    Console.WriteLine("DB Connection String : " + connectionString);
+    connectionString="";
+    
     using (SqlConnection connection = new SqlConnection(connectionString))
     {
       connection.Open();
@@ -76,12 +83,12 @@ public class PTILabelLookup
         {
           while (reader.Read())
           {
-              dbResponse = dbResponse + "    " + String.Format("{0}, {1}", reader[0], reader[1]); 
+              dbResponse = dbResponse + "    " + String.Format("PTI Number: {0}, Item number: {1}, Product name: {2}, Supplier Name: {3}, Route Number: {4}, Trailer Number: {5}, Seal Number: {6}, Quality Tips: {7}", reader[0], reader[1], reader[2], reader[3], reader[4], reader[5], reader[6], reader[7]); 
           }
           Console.WriteLine(dbResponse);
         }
       }
-      return "dbResponse";
+      return "The details for the given PTI number are:"+dbResponse;
     }
   }
 

@@ -23,8 +23,10 @@ public class AnalyzeImage
         [Description("Quality issues to check for")] string qualityIssues)
     {
         string apiKey = Environment.GetEnvironmentVariable("OPENAI_SECRET_KEY");
-        string base64Image = EncodeImageToBase64("C:\\temp\\sams\\spoil\\" + fileName);
-        Console.WriteLine("C:\\temp\\sams\\spoil\\" + fileName);
+        apiKey = "";
+        Console.WriteLine("API key" + apiKey);
+        string base64Image = EncodeImageToBase64("/Users/d0g0dj6/Documents/Projects/AI Assisted Claims/Hackathon/damaged_products/" + fileName);
+        Console.WriteLine("/Users/d0g0dj6/Documents/Projects/AI Assisted Claims/Hackathon/damaged_products/" + fileName);
 
         string instructions = "This is an image of a product Check the image of the product for damage or spoilage " +
             "related to the following issues:" + qualityIssues + ". Also describe any other quality " +
